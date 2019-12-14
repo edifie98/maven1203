@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+
+
+
+<mapper namespace="com.great.mapper.UserMapper">
+    <resultMap id="UserMap" type="com.great.javabean.TB_USER">
+        <result column="id" property="USID"></result>
+        <result column="name" property="UNAME"></result>
+        <result column="pass" property="UPASS"></result>
+        <result column="sex" property="USEX"></result>
+        <result column="edu" property="UEDU"></result>
+        <result column="state" property="USTATE"></result>
+        <result column="tel" property="UTEL"></result>
+        <result column="mail" property="UMAIL"></result>
+        <result column="integral" property="UINTEGRAL"></result>
+        <result column="regdate" property="UREGDATE"></result>
+        <result column="type" property="UTYPE"></result>
+        <result column="uoload" property="UUPLOADNUM"></result>
+        <result column="download" property="UDOWNLOADNUM"></result>
+    </resultMap>
+    <select id="findByUSID" resultMap="UserMap">
+        select  USID as id , UNAME as name,  UPASS as pass,  USEX as sex ,  UEDU as edu,  USTATE as state,  UMAIL as mail ,UINTEGRAL as integral,UREGDATE as regdate,UTYPE as type,UUPLOADNUM as uoload,UDOWNLOADNUM as download
+        from TB_USER
+        where USID=${USID}
+        AND UPASS=#{UPASS}
+    </select>
+
+
+
+
+    <insert id="addUser" parameterType="com.great.javabean.TB_USER" >
+        insert into TB_USER(UNAME)VALUES (#{UNAME})
+ </insert>
+
+    <update id="updateUser" parameterType="com.great.javabean.TB_USER" >
+         update  TB_USER set UNAME = #{UNAME}  where USID=#{USID}
+    </update>
+
+    <delete id="deleteById" parameterType="com.great.javabean.TB_USER">
+        delete from TB_USER where USID=#{USID}
+    </delete>
+
+
+
+
+<!--    <update id="updateByUser" parameterType="TB_USER" >-->
+<!--        update  TB_USER-->
+<!--&lt;!&ndash;        <set>&ndash;&gt;-->
+<!--&lt;!&ndash;            <if test="UNAME != null and UNAME != &quot;&quot;">&ndash;&gt;-->
+<!--&lt;!&ndash;                UNAME = #{UNAME}&ndash;&gt;-->
+<!--&lt;!&ndash;            </if>&ndash;&gt;-->
+<!--&lt;!&ndash;            <if test="UPASS != null and UPASS != &quot;&quot;">&ndash;&gt;-->
+<!--&lt;!&ndash;                UPASS = #{UPASS}&ndash;&gt;-->
+<!--&lt;!&ndash;            </if>&ndash;&gt;-->
+<!--&lt;!&ndash;        </set>&ndash;&gt;-->
+<!--            <trim prefix="set" suffixOverrides=",">-->
+<!--                <if test="UNAME != null and UNAME != &quot;&quot;">-->
+<!--                    UNAME = #{UNAME}-->
+<!--                </if>-->
+<!--                <if test="UPASS != null and UPASS != &quot;&quot;">-->
+<!--                    UPASS = #{UPASS}-->
+<!--                </if>-->
+<!--            </trim>-->
+<!--        <where>-->
+<!--            USID=#{USID}-->
+<!--        </where>-->
+
+<!--    </update>-->
+
+
+<!--    <insert id="addList" parameterType="java.util.List" >-->
+<!--        insert into TB_USER(USID,UNAME,UPASS)-->
+<!--        select SEQ_USER.NEXTVAL USID,A.*-->
+<!--        FROM(-->
+<!--        <foreach collection="list" item="item" index="index" separator="UNION ALL">-->
+<!--            SELECT-->
+<!--            #{item.UNAME} UNAME,#{item.UPASS} UPASS-->
+<!--            FROM dual-->
+<!--        </foreach>-->
+<!--        )A-->
+<!--    </insert>-->
+
+
+
+    <resultMap id="menuMap" type="com.great.javabean.TB_MENU">
+    </resultMap>
+    <select id="findMenuByUSID" parameterType="java.lang.Integer" resultMap="menuMap">
+       SELECT  A.MENU_ID,A.MENU_NAME PARENTNAME,B.MENU_NAME CHILDNAME,B.MENU_URL
+       FROM TB_MENU A,TB_MENU B
+       WHERE A.MENU_ID=B.PARENT_ID
+    </select>
+
+
+
+    <select id="findUserManager"  resultType="com.great.javabean.TB_USER">
+        select *
+        from (
+        select ROWNUM RN,A.*
+        FROM (SELECT * FROM TB_USER
+
+        <where>
+            <if test="userName != null and userName != ''">
+                AND UNAME LIKE  '%${userName}%'
+            </if>
+            <if test="startDate != null and startDate != '' and endDate == null ">
+                AND UREGDATE  &gt;= ${startDate}
+            </if>
+            <if test="endDate != null and endDate != '' and startDate == null ">
+                AND UREGDATE &lt;= ${endDate}
+            </if>
+            <if test="endDate != null and endDate != '' and startDate != null and startDate != ''">
+                AND UREGDATE between ${startDate} and ${endDate}
+            </if>
+
+        </where>
+        )A
+        )B
+        where RN
+        between #{startNum} AND #{lastNum}
+    </select>
+
+    <select resultType="java.lang.Integer" id="count">SELECT COUNT(USID) FROM TB_USER WHERE 1=1 </select>
+
+
+       </mapper>
